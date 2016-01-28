@@ -1,6 +1,10 @@
 # -- coding:utf8 -- #
 
 from HTMLParser import HTMLParser
+import re
+
+form_re = re.compile(r'<form[\s\S]*?</form>')
+
 html = '''
 <!DOCTYPE html>
 <html lang="zh-cn">
@@ -1049,11 +1053,13 @@ class HTMLForms(HTMLParser):
     #     if tag == 'form' and self.form > 0:
     #         self.form -= 1
 
-    def get_starttag_text(self):
-        print self
 
+def get_html_form(html):
+    return [i for i in re.findall(form_re, html)]
 
 if __name__ == '__main__':
-    hp = HTMLForms()
-    hp.feed(html)
-    hp.close()
+    # hp = HTMLForms()
+    # hp.feed(html)
+    # hp.close()
+    forms = get_html_form(html)
+    print forms

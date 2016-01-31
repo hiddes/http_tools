@@ -1032,26 +1032,34 @@ class HTMLForms(HTMLParser):
     """
     def __init__(self):
         HTMLParser.__init__(self)
-        self.forms = []
-        self.data = ''
-        self.form = 0
+        self.fields = dict()
+        self.submit = dict()
+        self.fields['name'] = []
 
     def handle_starttag(self, tag, attrs):
         if tag == 'form':
-            self.form += 1
+            for key, value in attrs:
+                if key == 'action':
+                    self.fields['action'] = value
+                elif key == 'method':
+                    self.fields['method'] = value
+        elif tag == 'input':
+            for key, value in attrs:
+                if key == 'type':
+                    self.submit['type'] = value
+                elif key == 'onclick':
+                    self.submit['onclick'] = value
+        else:
+            for key, value in attrs:
+                if key == 'name':
+                    self.fields['name'].append(value)
 
-    def handle_data(self, data):
-        if self.form:
-            print '1：' + str(self.form)
-            self.data += data
-        if self.data and not self.form:
-            self.forms.append(self.data)
-            self.data = ''
-            print '2：'+ str(self.form)
-
-    # def handle_endtag(self, tag):
-    #     if tag == 'form' and self.form > 0:
-    #         self.form -= 1
+    # def handle_data(self, data):
+    #     if self.form:
+    #         self.data += data
+    #     if self.data and not self.form:
+    #         self.forms.append(self.data)
+    #         self.data = ''
 
 
 def get_html_form(html):
@@ -1062,4 +1070,7 @@ if __name__ == '__main__':
     # hp.feed(html)
     # hp.close()
     forms = get_html_form(html)
-    print forms
+    hp = HTMLForms()
+    hp.feed(forms[1])
+    hp.close()
+    print hp.fields

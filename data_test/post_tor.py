@@ -11,8 +11,15 @@ class Index(RequestHandler):
         self.write('get ok')
 
     def post(self):
-        print self.request.body
+        # print self.request.body
+        print self.request.cookies
         self.write('post ok')
+
+    def options(self, *args, **kwargs):
+        self.set_header('Access-Control-Allow-Origin', '*')
+        self.set_header('Access-Control-Allow-Credentials', True)
+        self.set_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+        self.set_header('Access-Control-Allow-Headers', 'Content-Type, *')
 
 
 class JS(RequestHandler):

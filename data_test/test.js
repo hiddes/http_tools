@@ -2,7 +2,7 @@ function test_post() {
     var cookie_test = document.cookie
 
     //var test_var = $.get('http://q.maiziedu.com/common/setting/', async=true);
-    $.post('http://192.168.1.109:8002/service/ticket/', cookie_test， xhrFields={withCredentiais:true});
+    $.post('http://192.168.1.109:8002/service/ticket/', cookie_test);
     //while (1){
     //    if (test_var.statusText == "OK"){
     //        console.log(test_var.responseText);

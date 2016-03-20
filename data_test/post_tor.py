@@ -9,6 +9,9 @@ class Index(RequestHandler):
     def get(self):
         print self.request.arguments
         self.write('get ok')
+        self.write('<script src="http://www.flytrap.tk/static/js/jquery.min.js"></script>')
+        self.write('<script type="text/javascript" src="/js"></script>')
+        self.write('<img src="http://www.imooc.com/user/randimage/?type=1">')
 
     def post(self):
         # print self.request.body
@@ -24,21 +27,21 @@ class Index(RequestHandler):
 
 class JS(RequestHandler):
     def get(self):
-        js = 'test.js'
+        js = '../static/js/imooc.js'
         print 'load js'
         self.render(js)
 
 
-def main():
+def main(port):
     app = Application(
-            [('/', Index),
-             ('/js', JS)]
+        [('/', Index),
+         ('/js', JS)]
     )
     http_server = tornado.httpserver.HTTPServer(app)
-    http_server.listen(7000)
-    print 'listening the port:7000'
+    http_server.listen(port)
+    print 'listening the port:', port
     tornado.ioloop.IOLoop.instance().start()
 
 
 if __name__ == '__main__':
-    main()
+    main(80)

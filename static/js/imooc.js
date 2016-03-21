@@ -7,7 +7,7 @@ function immoc_test_post() {
     postData.nickname = 'csrf_bug';
     postData.about = 'csrf_bug';
     postData.province = 28;
-    postData.city = 224;
+    postData.city = 225;
     postData.area = 1878;
     $.ajax({
         url: "http://www.imooc.com/user/ajaxsetinfo",
@@ -27,4 +27,3 @@ function immoc_test_post() {
         }
     });
 }
-

@@ -48,10 +48,19 @@ class HTMLForms(HTMLParser):
 def get_html_form(html):
     return [i for i in re.findall(form_re, html)]
 
+
+def find_login_form(lis):
+    for i in lis:
+        hp = HTMLForms()
+        hp.feed(i)
+        hp.close()
+        if 'login' in hp.fields.get('action', ''):
+            return hp
+
+
 if __name__ == '__main__':
-    # hp = HTMLForms()
-    # hp.feed(html)
-    # hp.close()
+    import requests
+    html = requests.get('http://www.maiziedu.com/').text
     forms = get_html_form(html)
     hp = HTMLForms()
     hp.feed(forms[1])

@@ -22,27 +22,19 @@ class HTMLForms(HTMLParser):
     def handle_starttag(self, tag, attrs):
         if tag == 'form':
             for key, value in attrs:
-                if key == 'action':
-                    self.fields['action'] = value
-                elif key == 'method':
-                    self.fields['method'] = value
+                self.fields['action'] = value
         elif tag == 'input':
             for key, value in attrs:
                 if key == 'type':
                     self.submit['type'] = value
                 elif key == 'onclick':
                     self.submit['onclick'] = value
-        else:
-            for key, value in attrs:
-                if key == 'name':
+                elif key == 'name':
                     self.fields['name'].append(value)
-
-    # def handle_data(self, data):
-    #     if self.form:
-    #         self.data += data
-    #     if self.data and not self.form:
-    #         self.forms.append(self.data)
-    #         self.data = ''
+        # else:
+        #     for key, value in attrs:
+        #         if key == 'name':
+        #             self.fields['name'].append(value)
 
 
 def get_html_form(html):
@@ -50,19 +42,20 @@ def get_html_form(html):
 
 
 def find_login_form(lis):
+    login_froms = list()
     for i in lis:
         hp = HTMLForms()
         hp.feed(i)
         hp.close()
         if 'login' in hp.fields.get('action', ''):
-            return hp
+            login_froms.append(hp)
+    return login_froms
 
 
 if __name__ == '__main__':
     import requests
     html = requests.get('http://www.maiziedu.com/').text
     forms = get_html_form(html)
-    hp = HTMLForms()
-    hp.feed(forms[1])
-    hp.close()
+    hp = find_login_form(forms)
+
     print hp.fields

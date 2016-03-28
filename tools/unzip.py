@@ -26,16 +26,23 @@ def check_encode(name, index=0):
     except IndexError:
         raise Exception('dot discern you str')
     except Exception:
-        # 转不了，就算了吧
+        # 转不了，就算了吧    经测试，不影响使用
         return name
 
 
 def un_zip(zip_file):
+    """
+    执行解压行为的过程
+    :param zip_file:
+    :return:
+    """
     files = zipfile.ZipFile(zip_file, 'r')
     for f in files.namelist():
+        # 解决乱码，就这儿拉
         f_name = check_encode(f)
-        # pf = ''.join((os.path.dirname(zip_file), os.path.sep, os.path.dirname(f_name)))
+        # 绝对路径，比较保险
         f_name = ''.join((os.path.dirname(zip_file), os.path.sep, f_name))
+        # 父目录
         pf = os.path.dirname(f_name)
         if not os.path.exists(pf) and pf != "":
             # 创建父目录
@@ -50,12 +57,16 @@ def un_zip(zip_file):
 
 
 def un_zips():
+    """
+    批量处理，接受命令行 多个文件
+    :return:
+    """
     if len(sys.argv) < 2:
         print('place input two or to many prams!!!')
         exit(-1)
     file_paths = sys.argv[1:]
     for file_path in file_paths:
-        print(os.path.realpath(file_path))
+        # 解压
         un_zip(os.path.realpath(file_path))
 
 

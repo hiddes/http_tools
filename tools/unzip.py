@@ -25,8 +25,8 @@ def check_encode(name, index=0):
         return check_encode(name, index + 1)
     except IndexError:
         raise Exception('dot discern you str')
-    except Exception, e:
-        print e
+    except Exception:
+        # 转不了，就算了吧
         return name
 
 
@@ -38,9 +38,10 @@ def un_zip(zip_file):
         f_name = ''.join((os.path.dirname(zip_file), os.path.sep, f_name))
         pf = os.path.dirname(f_name)
         if not os.path.exists(pf) and pf != "":
+            # 创建父目录
             os.mkdir(pf)
         data = files.read(f)
-        # 直接覆盖
+        # 不是目录直接覆盖
         if not os.path.isdir(f_name):
             fo = open(f_name, 'w')
             fo.write(data)
@@ -54,7 +55,8 @@ def un_zips():
         exit(-1)
     file_paths = sys.argv[1:]
     for file_path in file_paths:
-        un_zip(file_path)
+        print(os.path.realpath(file_path))
+        un_zip(os.path.realpath(file_path))
 
 
 if __name__ == '__main__':

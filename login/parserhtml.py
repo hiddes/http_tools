@@ -13,6 +13,7 @@ class HTMLForms(HTMLParser):
     """
     test
     """
+
     def __init__(self):
         HTMLParser.__init__(self)
         self.fields = dict()
@@ -31,10 +32,10 @@ class HTMLForms(HTMLParser):
                     self.submit['onclick'] = value
                 elif key == 'name':
                     self.fields['name'].append(value)
-        # else:
-        #     for key, value in attrs:
-        #         if key == 'name':
-        #             self.fields['name'].append(value)
+                    # else:
+                    #     for key, value in attrs:
+                    #         if key == 'name':
+                    #             self.fields['name'].append(value)
 
 
 def get_html_form(html):
@@ -54,8 +55,9 @@ def find_login_form(lis):
 
 if __name__ == '__main__':
     import requests
+
     html = requests.get('http://www.maiziedu.com/').text
     forms = get_html_form(html)
     hp = find_login_form(forms)
 
-    print hp.fields
+    print hp[0].fields

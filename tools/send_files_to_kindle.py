@@ -69,13 +69,16 @@ class AddAttach(threading.Thread):
             if len(self.ok_list) > MAX_NUM or self.size_num > MAX_SIZE:
                 if self.send_mail(msg):
                     print('send to ok list:', self.ok_list[:-1])
+                    ok_dict.update({i: 'ok' for i in self.ok_list[:-1]})
                     self.ok_list = [file_name]
                 else:
                     self.bad_list.append(self.ok_list[:-1])
+                    self.ok_list = [file_name]
                 self.size_num = os.path.getsize(file_name)
                 msg = self.get_msg()
             self.add_attach(msg, file_name)
-            ok_dict[file_name] = 'ok'
+        print('send ok list:', ok_dict.keys())
+        print('no send list:', self.bad_list)
 
     def get_msg(self):
         msg = MIMEMultipart()
@@ -94,6 +97,7 @@ class AddAttach(threading.Thread):
 
     def send_mail(self, msg):
         try:
+            time.sleep(3000)
             self.smtp.sendmail(self.from_mail, self.to_mail, msg.as_string())
             return True
         except smtplib.SMTPDataError, e:
@@ -101,7 +105,10 @@ class AddAttach(threading.Thread):
                 print('文件大了')
             return False
         except smtplib.SMTPServerDisconnected:
-            self.smtp.connect(self.server_host, self.server_port)
+            if self.server_port and self.server_host:
+                self.smtp.connect(self.server_host, self.server_port)
+            else:
+                self.smtp.connect()
             self.send_mail(msg)
         except Exception, e:
             print(e)
@@ -120,6 +127,7 @@ def put_queue(file_path):
     os.path.walk(os.path.realpath(file_path), add_file, ())
 
 
+# 多进程
 def test_p(smtp, to_mail, from_mail, body, **kwargs):
     # sendto = kwargs.get('sendto')
     server_host = kwargs.get('server_host')
@@ -149,7 +157,10 @@ def test_p(smtp, to_mail, from_mail, body, **kwargs):
                 print('文件大了')
             return False
         except smtplib.SMTPServerDisconnected:
-            smtp.connect(server_host, server_port)
+            if server_host and server_port:
+                smtp.connect(server_host, server_port)
+            else:
+                smtp.connect()
             send_mail(msg)
         except Exception, e:
             print(e)
@@ -171,6 +182,7 @@ def test_p(smtp, to_mail, from_mail, body, **kwargs):
         if len(ok_list) > MAX_NUM or size_num > MAX_SIZE:
             if send_mail(msg):
                 print('send to ok list:', ok_list[:-1])
+                ok_dict.update({i: 'ok' for i in ok_list[:-1]})
                 ok_list = [file_name]
             else:
                 bad_list.append(ok_list[:-1])
@@ -178,7 +190,8 @@ def test_p(smtp, to_mail, from_mail, body, **kwargs):
             size_num = file_size
             msg = get_msg()
         add_attach(msg, file_name)
-        ok_dict[file_name] = 'ok'
+    print('send ok list:', ok_dict.keys())
+    print('no send list:', bad_list)
 
 
 def main(mail, passwd, file_path, sendto):
@@ -189,7 +202,10 @@ def main(mail, passwd, file_path, sendto):
         if 'successful' in test_[1]:
             print('login ok!!!')
             test_p(smtp, send_to, mail, 'test', server_host=server_host, server_port=server_port)
+
+            # 多线程启动
             # thread_list = list()
+            # thread_num = 5
             # for i in xrange(thread_num):
             #     thread_list.insert(0, AddAttach(smtp, mail, send_to, server_host=server_host, server_port=server_port))
             #     thread_list[0].start()
@@ -203,9 +219,8 @@ def main(mail, passwd, file_path, sendto):
 if __name__ == '__main__':
     mail = 'test@maiziedu.com'
     passwd = 'test.'
-    send_to = ['test@kindle.cn',]
+    send_to = ['test@kindle.cn', ]
     file_path = '/home/hidden/Downloads/子乌书简全站mobi书籍_part1'
-    thread_num = 5
     main(mail, passwd, file_path, send_to)
     # msg = MIMEMultipart()
     # add_attach_p(msg, file_path)

@@ -3,7 +3,7 @@
 import requests
 import traceback
 
-from parserhtml import HTMLForms
+from parserhtml import get_fields_to_login
 
 
 def get_index_html(url):
@@ -15,6 +15,10 @@ def get_index_html(url):
     else:
         if req.status_code == 200:
             return req.text
+
+
+def test(index, user, passwd):
+    get_fields_to_login(index)
 
 
 if __name__ == '__main__':

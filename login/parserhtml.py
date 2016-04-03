@@ -23,7 +23,7 @@ class HTMLForms(HTMLParser):
     def handle_starttag(self, tag, attrs):
         if tag == 'form':
             for key, value in attrs:
-                self.fields['action'] = value
+                self.fields[key] = value
         elif tag == 'input':
             for key, value in attrs:
                 if key == 'type':
@@ -32,10 +32,30 @@ class HTMLForms(HTMLParser):
                     self.submit['onclick'] = value
                 elif key == 'name':
                     self.fields['name'].append(value)
-                    # else:
-                    #     for key, value in attrs:
-                    #         if key == 'name':
-                    #             self.fields['name'].append(value)
+
+
+class AjaxLogin(HTMLParser):
+    def __init__(self):
+        HTMLParser.__init__(self)
+        self.fields = ['input', 'button']
+        self.login_functions = list()
+
+    def handle_starttag(self, tag, attrs):
+        if tag in self.fields:
+            if dict(attrs).has_key('onclick'):
+                for key, value in attrs:
+                    if 'login' in value:
+                        self.login_functions.append(dict(attrs))
+
+
+def find_ajax_login(text):
+    li = list()
+    a = AjaxLogin()
+    a.feed(text)
+    a.close()
+    for i in a.login_functions:
+        li.append(i.get('onclick', ''))
+    return list(set(li))
 
 
 def get_html_form(html):
@@ -48,16 +68,42 @@ def find_login_form(lis):
         hp = HTMLForms()
         hp.feed(i)
         hp.close()
+        if not hp.fields.get('action', ''):
+            pass
         if 'login' in hp.fields.get('action', ''):
             login_froms.append(hp)
     return login_froms
 
 
-if __name__ == '__main__':
-    import requests
+def get_fields_to_login(index):
+    forms = get_html_form(html)
+    hps = find_login_form(forms)
+    return (hp.fields['name'] for hp in hps)
 
-    html = requests.get('http://www.maiziedu.com/').text
+
+def ajax_analyse(index):
+    ajax_re = r'$ajax'
+
+
+def find_log_info(index):
+    info = dict()
+    info['ajax_url'] = list()
+    info['post_data'] = dict()
+    return info
+
+
+def test():
+    test_file_path = '/home/hidden/Documents/www.html'
+    html = open(test_file_path, 'r').read()
+    print('get html ok')
     forms = get_html_form(html)
     hp = find_login_form(forms)
-
     print hp[0].fields
+
+
+if __name__ == '__main__':
+    test_file_path = '/home/hidden/Documents/www.html'
+    html = open(test_file_path, 'r').read()
+    a = AjaxLogin()
+    a.feed(html)
+    a.close()
